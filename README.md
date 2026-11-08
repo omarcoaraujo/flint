@@ -1,24 +1,26 @@
 # Flint
 
+<a href="https://github.com/omarcoaraujo/flint/actions/workflows/check.yml"><img src="https://github.com/omarcoaraujo/flint/actions/workflows/check.yml/badge.svg" alt="Check"/></a> <a href="https://github.com/omarcoaraujo/flint/actions/workflows/release.yml"><img src="https://github.com/omarcoaraujo/flint/actions/workflows/release.yml/badge.svg" alt="Release"/></a>
+
 A typed, ergonomic CLI argument parser for [Luau](https://luau.org/).
 
-Declare your command-line interface once — Flint handles parsing, validation, and `--help` for you.
+Declare your command-line interface once: Flint handles parsing, validation, and `--help` for you.
 
 ```luau
-local flint = require("@pkg/flint")
-local command, opt, flag, arg = flint.command, flint.opt, flint.flag, flint.arg
+const flint = require("@pkg/flint")
+const command, opt, flag, arg = flint.command, flint.opt, flint.flag, flint.arg
 
-local cli = command("greet", "Greet someone") {
-    arg "name" { help = "who to greet" },
-    opt "count" { short = "n", type = "number", default = 1, help = "how many times" },
-    flag "loud" { short = "l", help = "shout it" },
+const cli = command("greet", "Greet someone") {
+	arg "name" { help = "who to greet" },
+	opt "count" { short = "n", type = "number", default = 1, help = "how many times" },
+	flag "loud" { short = "l", help = "shout it" },
 }
 
-local args = cli:parse()
+const args = cli:parse()
 
 for _ = 1, args.count do
-    local message = `Hello, {args.name}!`
-    print(if args.loud then message:upper() else message)
+	const message = `Hello, {args.name}!`
+	print(if args.loud then message:upper() else message)
 end
 ```
 
@@ -31,14 +33,14 @@ HELLO, WORLD!
 ## Features
 
 - Declarative, minimal syntax inspired by [Vide](https://github.com/centau/vide)
-- Fully typed — parsed results carry their types, so `args.count` is a `number` and your LSP knows it
+- Fully typed: parsed results carry their types, so `args.count` is a `number` and your LSP knows it
 - Auto-generated `--help` and `--version`, colored via [Tint](https://github.com/omarcoaraujo/tint)
 - Positional arguments, options with values, and boolean flags
 - Nested subcommands (`git commit`, `git push`) with their own options
 - Typed values (`string`, `number`, `boolean`) with validation and clear errors
 - Required options, default values, and repeatable options
-- Helpful errors — unknown flags suggest the closest match ("did you mean `--output`?")
-- Runtime agnostic — works with Lute, Lune, and Zune
+- Helpful errors: unknown flags suggest the closest match ("did you mean `--output`?")
+- Runtime agnostic: works with Lute, Lune, and Zune
 
 ## Installation
 
@@ -52,7 +54,7 @@ flint = { name = "omarcoaraujo/flint", version = "^0.1.0" }
 Then require it:
 
 ```luau
-local flint = require("@pkg/flint")
+const flint = require("@pkg/flint")
 ```
 
 ## Usage
@@ -61,10 +63,10 @@ local flint = require("@pkg/flint")
 
 Flint gives you four building blocks, which you import and compose:
 
-- `command(name, about)` — the root of your CLI (or a subcommand)
-- `opt(name)` — an option that takes a value: `--output path`
-- `flag(name)` — a boolean switch: `--verbose`
-- `arg(name)` — a positional argument: the bare `file.txt`
+- `command(name, about)`: the root of your CLI (or a subcommand)
+- `opt(name)`: an option that takes a value, like `--output path`
+- `flag(name)`: a boolean switch, like `--verbose`
+- `arg(name)`: a positional argument, like the bare `file.txt`
 
 Each piece takes a config table. The name becomes the long form automatically, so `opt "output"` is `--output`.
 
@@ -73,13 +75,13 @@ Each piece takes a config table. The name becomes the long form automatically, s
 An option takes a value. Configure its short form, type, whether it's required, and a default:
 
 ```luau
-local cli = command("build", "Build the project") {
-    opt "output" { short = "o", help = "output directory" },
-    opt "jobs" { short = "j", type = "number", default = 4, help = "parallel jobs" },
-    opt "target" { required = true, help = "build target" },
+const cli = command("build", "Build the project") {
+	opt "output" { short = "o", help = "output directory" },
+	opt "jobs" { short = "j", type = "number", default = 4, help = "parallel jobs" },
+	opt "target" { required = true, help = "build target" },
 }
 
-local args = cli:parse()
+const args = cli:parse()
 print(args.output, args.jobs, args.target)
 ```
 
@@ -92,17 +94,18 @@ If `--target` is missing, Flint stops and prints a clear error instead of handin
 
 ### Flags
 
-A flag is a boolean — present means `true`, absent means `false`:
+A flag is a boolean: present means `true`, absent means `false`:
 
 ```luau
-local cli = command("run", "Run the app") {
-    flag "verbose" { short = "v", help = "verbose output" },
-    flag "dry-run" { help = "don't actually do anything" },
+const cli = command("run", "Run the app") {
+	flag "verbose" { short = "v", help = "verbose output" },
+	flag "dry-run" { help = "don't actually do anything" },
 }
 
-local args = cli:parse()
+const args = cli:parse()
+
 if args.verbose then
-    print("running in verbose mode")
+	print("running in verbose mode")
 end
 ```
 
@@ -113,12 +116,12 @@ Flags can be combined in the usual short form: `-v` and `-l` become `-vl`.
 Positional arguments are matched by order:
 
 ```luau
-local cli = command("copy", "Copy a file") {
-    arg "source" { help = "file to copy" },
-    arg "dest" { help = "where to copy it" },
+const cli = command("copy", "Copy a file") {
+	arg "source" { help = "file to copy" },
+	arg "dest" { help = "where to copy it" },
 }
 
-local args = cli:parse()
+const args = cli:parse()
 print(`copying {args.source} -> {args.dest}`)
 ```
 
@@ -136,33 +139,34 @@ By default, values are strings. Set `type` to have Flint parse and validate them
 ```luau
 opt "port" { type = "number", default = 8080 }
 opt "name" { type = "string" }
-flag "debug" {}  -- flags are always boolean
+flag "debug" {}
 ```
 
-If the user passes `--port abc`, Flint reports the type mismatch rather than silently giving you a bad value. Parsed results are typed accordingly — `args.port` is a `number`.
+Flags are always boolean, so they take no `type`. If the user passes `--port abc`, Flint reports the type mismatch rather than silently giving you a bad value. Parsed results are typed accordingly: `args.port` is a `number`.
 
 ### Subcommands
 
 A subcommand is just a `command` nested inside another. Each has its own options, arguments, and help:
 
 ```luau
-local cli = command("git", "Version control") {
-    command("commit", "Record changes") {
-        flag "amend" { help = "amend the previous commit" },
-        opt "message" { short = "m", required = true, help = "commit message" },
-    },
-    command("push", "Upload changes") {
-        arg "remote" { default = "origin", help = "remote name" },
-        flag "force" { short = "f", help = "force push" },
-    },
+const cli = command("git", "Version control") {
+	command("commit", "Record changes") {
+		flag "amend" { help = "amend the previous commit" },
+		opt "message" { short = "m", required = true, help = "commit message" },
+	},
+
+	command("push", "Upload changes") {
+		arg "remote" { default = "origin", help = "remote name" },
+		flag "force" { short = "f", help = "force push" },
+	},
 }
 
-local args = cli:parse()
+const args = cli:parse()
 
 if args.command == "commit" then
-    print("committing:", args.message)
+	print("committing:", args.message)
 elseif args.command == "push" then
-    print("pushing to:", args.remote)
+	print("pushing to:", args.remote)
 end
 ```
 
@@ -175,14 +179,19 @@ The invoked subcommand is reported in `args.command`, and its own parsed values 
 
 ### Parsing
 
-Call `parse` with no arguments to read from the process arguments automatically, or pass a table to parse explicitly (handy for testing):
+Call `parse` with no arguments to read from the process arguments automatically:
 
 ```luau
-local args = cli:parse()                        -- reads process args
-local args = cli:parse({ "--target", "release" }) -- explicit
+const args = cli:parse()
 ```
 
-On a parse error — unknown flag, missing required option, bad type — Flint prints a message and the relevant usage, then signals failure. You don't write any of that handling yourself.
+Or pass a table to parse explicitly, which is handy for testing:
+
+```luau
+const args = cli:parse({ "--target", "release" })
+```
+
+On a parse error (unknown flag, missing required option, bad type) Flint prints a message and the relevant usage, then signals failure. You don't write any of that handling yourself.
 
 ## Help and version
 
@@ -206,9 +215,9 @@ Options:
 Set a version to get `--version` for free:
 
 ```luau
-local cli = command("greet", "Greet someone") {
-    version = "1.0.0",
-    -- ...
+const cli = command("greet", "Greet someone") {
+	version = "1.0.0",
+	arg "name" { help = "who to greet" },
 }
 ```
 
